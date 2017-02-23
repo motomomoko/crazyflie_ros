@@ -2,15 +2,14 @@
 
 import rospy
 import tf
-from geometry_msgs.msg import PoseStamped
-from sensor_msgs.msg import Joy
-from math import fabs
+from geometry_msgs.msg import Pose, PoseStamped
+import threading
 
 lastData = None
 
-def joyChanged(data):
+def joyChanged(pos):
     global lastData
-    lastData = data
+    lastData = pos
     # print(data)
 
 if __name__ == '__main__':
@@ -40,19 +39,15 @@ if __name__ == '__main__':
     msg.pose.orientation.w = quaternion[3]
 
     pub = rospy.Publisher(name, PoseStamped, queue_size=1)
-    rospy.Subscriber(joy_topic, Joy, joyChanged)
+    rospy.Subscriber(file, Pose, read_pos)
 
     while not rospy.is_shutdown():
-        global lastData
+        # global lastData
         if lastData != None:
-            if fabs(lastData.axes[1]) > 0.1:
-                msg.pose.position.z += lastData.axes[1] / r / 2
-            if fabs(lastData.axes[4]) > 0.1:
-                msg.pose.position.x += lastData.axes[4] / r * 1
-            if fabs(lastData.axes[3]) > 0.1:
-                msg.pose.position.y += lastData.axes[3] / r * 1
-            if fabs(lastData.axes[0]) > 0.1:
-                yaw += lastData.axes[0] / r * 2
+                msg.pose.position.x = lastData.position.x
+                msg.pose.position.y = lastData.position.y
+                msg.pose.position.z = lastData.position.z
+                yaw = lastData.orientation.w
             quaternion = tf.transformations.quaternion_from_euler(0, 0, yaw)
             msg.pose.orientation.x = quaternion[0]
             msg.pose.orientation.y = quaternion[1]

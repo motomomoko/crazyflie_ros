@@ -1,63 +1,79 @@
 #!/usr/bin/env python
 
 import rospy
-from sensor_msgs.msg import Joy
 from crazyflie_driver.srv import UpdateParams
 from std_srvs.srv import Empty
+import threading
+import OSC
 
-class Controller():
-    def __init__(self, use_controller, joy_topic):
-        rospy.wait_for_service('update_params')
-        rospy.loginfo("found update_params service")
-        self._update_params = rospy.ServiceProxy('update_params', UpdateParams)
+trigger = None
 
-        rospy.loginfo("waiting for emergency service")
-        rospy.wait_for_service('emergency')
-        rospy.loginfo("found emergency service")
-        self._emergency = rospy.ServiceProxy('emergency', Empty)
+def msgPrint(addr, tags, data, client_address):
+    global trigger
+    trigger = data
+#    print trigger
 
-        if use_controller:
-            rospy.loginfo("waiting for land service")
-            rospy.wait_for_service('land')
-            rospy.loginfo("found land service")
-            self._land = rospy.ServiceProxy('land', Empty)
+server_address = ("192.168.11.102", 5000)
+server = OSC.OSCServer(server_address)
+server.addDefaultHandlers()
+server.addMsgHandler("/trigger", msgPrint)
+server_thread = threading.Thread(target=server.serve_forever)
+server_thread.start()
 
-            rospy.loginfo("waiting for takeoff service")
-            rospy.wait_for_service('takeoff')
-            rospy.loginfo("found takeoff service")
-            self._takeoff = rospy.ServiceProxy('takeoff', Empty)
-        else:
-            self._land = None
-            self._takeoff = None
+if __name__ == '__main__':
+    rospy.init_node('crazyflie_demo_controller', anonymous=True)
 
-        # subscribe to the joystick at the end to make sure that all required
-        # services were found
-        self._buttons = None
-        rospy.Subscriber(joy_topic, Joy, self._joyChanged)
+    rospy.wait_for_service('update_params')
+    rospy.loginfo("found update_params service")
+    update_params = rospy.ServiceProxy('update_params', UpdateParams)
 
-    def _joyChanged(self, data):
-        for i in range(0, len(data.buttons)):
-            if self._buttons == None or data.buttons[i] != self._buttons[i]:
-                if i == 0 and data.buttons[i] == 1 and self._land != None:
-                    self._land()
-                if i == 1 and data.buttons[i] == 1:
-                    self._emergency()
-                if i == 2 and data.buttons[i] == 1 and self._takeoff != None:
-                    self._takeoff()
-                if i == 4 and data.buttons[i] == 1:
+    rospy.loginfo("waiting for emergency service")
+    rospy.wait_for_service('emergency')
+    rospy.loginfo("found emergency service")
+    emergency = rospy.ServiceProxy('emergency', Empty)
+
+    rospy.loginfo("waiting for land service")
+    rospy.wait_for_service('land')
+    rospy.loginfo("found land service")
+    land = rospy.ServiceProxy('land', Empty)
+
+    rospy.loginfo("waiting for takeoff service")
+    rospy.wait_for_service('takeoff')
+    rospy.loginfo("found takeoff service")
+    takeoff = rospy.ServiceProxy('takeoff', Empty)
+
+    buttons = None
+
+    while not rospy.is_shutdown():
+#    while True:
+#        global trigger
+#        print "while"
+        if trigger == None:
+            continue
+        for i in range(0, len(trigger)):
+            if buttons == None or trigger[i] != buttons[i]:
+#                print "enter"
+#                print trigger
+#                print buttons
+                if i == 0 and trigger[i] == 1 and land != None:
+#                    print "land"
+                    land()
+                if i == 1 and trigger[i] == 1:
+#                    print "emergency"
+                    emergency()
+                if i == 2 and trigger[i] == 1 and takeoff != None:
+#                    print"takeoff"
+                    takeoff()
+                if i == 3 and trigger[i] == 1:
+#                    print "LED"
                     value = int(rospy.get_param("ring/headlightEnable"))
                     if value == 0:
                         rospy.set_param("ring/headlightEnable", 1)
                     else:
                         rospy.set_param("ring/headlightEnable", 0)
-                    self._update_params(["ring/headlightEnable"])
+                    update_params(["ring/headlightEnable"])
                     print(not value)
 
-        self._buttons = data.buttons
+        buttons = trigger
 
-if __name__ == '__main__':
-    rospy.init_node('crazyflie_demo_controller', anonymous=True)
-    use_controller = rospy.get_param("~use_crazyflie_controller", False)
-    joy_topic = rospy.get_param("~joy_topic", "joy")
-    controller = Controller(use_controller, joy_topic)
-    rospy.spin()
+#        rospy.spin()

@@ -3,21 +3,20 @@
 import rospy
 import tf
 from geometry_msgs.msg import Pose, PoseStamped
-import threading
 
 lastData = None
 
-def joyChanged(pos):
+
+def read_pos(pos):
     global lastData
     lastData = pos
-    # print(data)
 
 if __name__ == '__main__':
     rospy.init_node('publish_pose', anonymous=True)
     worldFrame = rospy.get_param("~worldFrame", "/world")
     name = rospy.get_param("~name")
     r = rospy.get_param("~rate")
-    joy_topic = rospy.get_param("~joy_topic", "joy")
+    flie = rospy.get_param("~flie")
     x = rospy.get_param("~x")
     y = rospy.get_param("~y")
     z = rospy.get_param("~z")
@@ -39,21 +38,20 @@ if __name__ == '__main__':
     msg.pose.orientation.w = quaternion[3]
 
     pub = rospy.Publisher(name, PoseStamped, queue_size=1)
-    rospy.Subscriber(file, Pose, read_pos)
+    rospy.Subscriber(flie, Pose, read_pos)
 
     while not rospy.is_shutdown():
         # global lastData
-        if lastData != None:
-                msg.pose.position.x = lastData.position.x
-                msg.pose.position.y = lastData.position.y
-                msg.pose.position.z = lastData.position.z
-                yaw = lastData.orientation.w
+        if lastData is not None:
+            msg.pose.position.x = lastData.position.x
+            msg.pose.position.y = lastData.position.y
+            msg.pose.position.z = lastData.position.z
+            yaw = lastData.orientation.w
             quaternion = tf.transformations.quaternion_from_euler(0, 0, yaw)
             msg.pose.orientation.x = quaternion[0]
             msg.pose.orientation.y = quaternion[1]
             msg.pose.orientation.z = quaternion[2]
             msg.pose.orientation.w = quaternion[3]
-            # print(pose)
         msg.header.seq += 1
         msg.header.stamp = rospy.Time.now()
         pub.publish(msg)

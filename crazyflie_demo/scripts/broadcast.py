@@ -1,18 +1,18 @@
 #!/usr/bin/env python
 
-import rospy
-import tf
 from geometry_msgs.msg import Pose
-import threading
 import OSC
+import rospy
+import threading
 
 lastData = None
+
 
 def msgPrint(addr, tags, data, client_address):
     global lastData
     lastData = data
 
-server_address = ("192.168.11.102", 8000) 
+server_address = ("192.168.11.102", 8000)
 server = OSC.OSCServer(server_address)
 server.addDefaultHandlers()
 server.addMsgHandler("/pos", msgPrint)
@@ -37,36 +37,36 @@ if __name__ == '__main__':
 
     while not rospy.is_shutdown():
         # global lastData
-        if lastData != None:
-            if lastData[0][0] == 1: # change
-                cast.position.x = lastData[0][1]
-                cast.position.y = lastData[0][2]
-                cast.position.z = lastData[0][3]
-                cast.orientation.w = lastData[0][4]
+        if lastData is not None:
+            if lastData[0] == 1:
+                cast.position.x = lastData[1]
+                cast.position.y = lastData[2]
+                cast.position.z = lastData[3]
+                cast.orientation.w = lastData[4]
                 pub0.publish(cast)
-            elif lastData[1][0] == 1:
-                cast.position.x = lastData[1][1]
-                cast.position.y = lastData[1][2]
-                cast.position.z = lastData[1][3]
-                cast.orientation.w = lastData[1][4]
+            elif lastData[2] == 1:
+                cast.position.x = lastData[1]
+                cast.position.y = lastData[2]
+                cast.position.z = lastData[3]
+                cast.orientation.w = lastData[4]
                 pub1.publish(cast)
-            elif lastData[2][0] == 1:
-                cast.position.x = lastData[2][1]
-                cast.position.y = lastData[2][2]
-                cast.position.z = lastData[2][3]
-                cast.orientation.w = lastData[2][4]
+            elif lastData[0] == 2:
+                cast.position.x = lastData[1]
+                cast.position.y = lastData[2]
+                cast.position.z = lastData[3]
+                cast.orientation.w = lastData[4]
                 pub2.publish(cast)
-            elif lastData[3][0] == 1:
-                cast.position.x = lastData[3][1]
-                cast.position.y = lastData[3][2]
-                cast.position.z = lastData[3][3]
-                cast.orientation.w = lastData[3][4]
+            elif lastData[0] == 3:
+                cast.position.x = lastData[1]
+                cast.position.y = lastData[2]
+                cast.position.z = lastData[3]
+                cast.orientation.w = lastData[4]
                 pub3.publish(cast)
-            elif lastData[4][0] == 1:
-                cast.position.x = lastData[4][1]
-                cast.position.y = lastData[4][2]
-                cast.position.z = lastData[4][3]
-                cast.orientation.w = lastData[4][4]
+            elif lastData[0] == 4:
+                cast.position.x = lastData[1]
+                cast.position.y = lastData[2]
+                cast.position.z = lastData[3]
+                cast.orientation.w = lastData[4]
                 pub4.publish(cast)
             else:
                 print "cannot read position"

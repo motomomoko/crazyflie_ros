@@ -39,7 +39,7 @@ if __name__ == '__main__':
     msg.pose.orientation.w = quaternion[3]
 
     pub = rospy.Publisher(name, PoseStamped, queue_size=1)
-    rospy.Subscriber(flie, Pose, read_pos)  #第３引数は実行する関数
+    rospy.Subscriber(flie, Pose, read_pos)  #read_pos is function
 
     while not rospy.is_shutdown():
         if lastData is not None:

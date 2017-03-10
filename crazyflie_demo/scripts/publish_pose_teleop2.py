@@ -17,6 +17,7 @@ if __name__ == '__main__':
     name = rospy.get_param("~name")
     r = rospy.get_param("~rate")
     flie = rospy.get_param("~flie")
+    print("pose name = %s" % flie)
     x = rospy.get_param("~x")
     y = rospy.get_param("~y")
     z = rospy.get_param("~z")
@@ -38,10 +39,9 @@ if __name__ == '__main__':
     msg.pose.orientation.w = quaternion[3]
 
     pub = rospy.Publisher(name, PoseStamped, queue_size=1)
-    rospy.Subscriber(flie, Pose, read_pos)
+    rospy.Subscriber(flie, Pose, read_pos)  #第３引数は実行する関数
 
     while not rospy.is_shutdown():
-        # global lastData
         if lastData is not None:
             msg.pose.position.x = lastData.position.x
             msg.pose.position.y = lastData.position.y

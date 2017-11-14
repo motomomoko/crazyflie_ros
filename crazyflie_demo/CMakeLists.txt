@@ -5,13 +5,7 @@ project(crazyflie_demo)
 ## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)
 ## is used, also find other catkin packages
 find_package(catkin REQUIRED COMPONENTS
-<<<<<<< HEAD
-	rospy
-	std_msgs
-	message_generation	
-=======
   roscpp
->>>>>>> e2ade2a3cbd1964a9f9618cc9e93dca07007b1ad
 )
 
 ## System dependencies are found with CMake's conventions
@@ -50,7 +44,8 @@ find_package(catkin REQUIRED COMPONENTS
 ## Generate messages in the 'msg' folder
 # add_message_files(
 #   FILES
-#   RangeArray.msg
+#   Message1.msg
+#   Message2.msg
 # )
 
 ## Generate services in the 'srv' folder
@@ -68,10 +63,10 @@ find_package(catkin REQUIRED COMPONENTS
 # )
 
 ## Generate added messages and services with any dependencies listed here
-generate_messages(
-  DEPENDENCIES
-  std_msgs  # Or other packages containing msgs
-)
+# generate_messages(
+#   DEPENDENCIES
+#   std_msgs  # Or other packages containing msgs
+# )
 
 ###################################
 ## catkin specific configuration ##
@@ -85,11 +80,7 @@ generate_messages(
 catkin_package(
 #  INCLUDE_DIRS include
 #  LIBRARIES crazyflie_demo
-<<<<<<< HEAD
-   CATKIN_DEPENDS message_runtime 
-=======
  CATKIN_DEPENDS roscpp
->>>>>>> e2ade2a3cbd1964a9f9618cc9e93dca07007b1ad
 #  DEPENDS system_lib
 )
 
@@ -99,10 +90,6 @@ catkin_package(
 
 ## Specify additional locations of header files
 ## Your package locations should be listed before other locations
-<<<<<<< HEAD
-# include_directories(include)
-=======
->>>>>>> e2ade2a3cbd1964a9f9618cc9e93dca07007b1ad
 include_directories(
   ${catkin_INCLUDE_DIRS}
 )

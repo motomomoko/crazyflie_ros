@@ -14,9 +14,16 @@
   <author email="whoenig@usc.edu">Wolfgang Hoenig</author>
 
   <buildtool_depend>catkin</buildtool_depend>
+<<<<<<< HEAD
   <build_depend>rospy</build_depend>
   <run_depend>rospy</run_depend>
 
   <build_depend>message_generationn</build_depend>
   <run_depend>message_runtime</run_depend>
+=======
+
+  <build_depend>roscpp</build_depend>
+
+  <run_depend>roscpp</run_depend>
+>>>>>>> e2ade2a3cbd1964a9f9618cc9e93dca07007b1ad
 </package>
